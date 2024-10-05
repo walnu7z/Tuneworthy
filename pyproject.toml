@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Tuneworthy"
+version = "0.1.0"
+description = "A music library management tool with ID3 tag mining and database management."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name="Walter Arredondo", email="walter@ciencias.unam.mx" }
+]
+requires-python = ">=3.7"
+dependencies = []
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests"
+]
+
+[tool.setuptools]
+packages = { find = { where = ["src"] } }
+package-dir = { "" = "src" }
+
+[project.optional-dependencies]
+testing = ["pytest"]

@@ -1,0 +1,12 @@
+# Ignore Makefile
+makefile
+
+# Ignore cleanup script
+clean.sh
+
+# Ignore VS Code directory
+.vscode
+
+#ignore db
+biblioteca.db
+
