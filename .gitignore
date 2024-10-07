@@ -6,6 +6,7 @@ clean.sh
 
 # Ignore VS Code directory
 .vscode
+*__*
 
 #ignore db
 biblioteca.db
