@@ -1,3 +1,7 @@
+# Ignore cache files
+*__*
+poetry.lock
+
 # Ignore Makefile
 makefile
 
@@ -6,7 +10,6 @@ clean.sh
 
 # Ignore VS Code directory
 .vscode
-*__*
 
 #ignore db
 biblioteca.db

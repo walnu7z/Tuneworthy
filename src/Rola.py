@@ -1,5 +1,5 @@
 class Rola:
-    def __init__(self, id_performer, id_performer_type, id_album, path, title, track, year, genre):
+    def __init__(self, id_performer, id_performer_type, id_album, path, title, track, year, genre, album, performer):
         self.id_performer = id_performer
         self.id_performer_type = id_performer_type
         self.id_album = id_album
@@ -8,6 +8,8 @@ class Rola:
         self.track = track
         self.year = year
         self.genre = genre
+        self.album = album
+        self.performer = performer
 
     def __str__(self):
         return  f"title:\t\t{self.title}\n"\
@@ -29,6 +31,8 @@ class RolaBuilder:
         self._track = None
         self._year = None
         self._genre = None
+        self._album = None
+        self._performer = None
 
     def set_id_performer(self, id_performer):
         self._id_performer = id_performer
@@ -63,6 +67,14 @@ class RolaBuilder:
     def set_genre(self, genre):
         self._genre = genre
         return self
+    
+    def set_album(self, album):
+        self._album = album
+        return self
+
+    def set_performer(self, performer):
+        self._performer = performer
+        return self
 
     def build(self):
         return Rola(
@@ -73,5 +85,7 @@ class RolaBuilder:
             title=self._title,
             track=self._track,
             year=self._year,
-            genre=self._genre
+            genre=self._genre,
+            album=self._album,
+            performer=self._performer
         )

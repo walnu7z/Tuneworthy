@@ -96,7 +96,7 @@ class TestEntries:
             )
 
             # Add Rola to the database using the Mena Class
-            minero.add_entry_from_mena(rola_song)
+            minero.add_song_from_mena(rola_song)
 
             # Verify the Rola was added
             minero.db.cursor.execute("SELECT * FROM rolas WHERE title = ?", (song.TIT2,))

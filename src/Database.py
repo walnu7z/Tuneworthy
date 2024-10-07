@@ -1,4 +1,6 @@
 import sqlite3
+import os
+from src.Rola import *
 
 class MusicLibraryDB:
     def __init__(self, db_name='biblioteca.db'):
@@ -52,7 +54,7 @@ class MusicLibraryDB:
     def close(self):
         self.conn.close()
 
-    def add_entry(self, performer, album, path, title, track, year, genre):
+    def add_song(self, performer, album, path, title, track, year, genre):
         conn = self.conn
         cursor = self.cursor
 
@@ -64,6 +66,19 @@ class MusicLibraryDB:
                     (id_performer, id_album, path, title, track, year, genre))
 
         conn.commit()
+        
+        RB = RolaBuilder()
+        RB.set_album(album)
+        RB.set_genre(genre)
+        RB.set_id_album(id_album)
+        RB.set_id_performer(id_performer)
+        RB.set_path(path)
+        RB.set_performer(performer)
+        RB.set_title(title)
+        RB.set_track(track)
+        RB.set_year(year)
+        return RB.build()
+
 
     # Function to insert into performers table only if the performer doesn't exist, return id_performer
     def insert_performer_if_not_exists(self, performer_type, performer_name):
@@ -80,8 +95,9 @@ class MusicLibraryDB:
         return cursor.lastrowid  # Return new id_performer
 
     # Function to insert into albums table only if the album doesn't exist, return id_album
-    def insert_album_if_not_exists(self, album_path, album_name, album_year):
+    def insert_album_if_not_exists(self, filepath, album_name, album_year):
         # Check if album already exists
+        album_path = os.path.dirname(filepath)
         cursor = self.cursor
         cursor.execute('SELECT id_album FROM albums WHERE path = ? AND name = ? AND year = ?', 
                     (album_path, album_name, album_year))
