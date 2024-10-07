@@ -1,7 +1,9 @@
 from src.Database import *
 from src.Rola import *
 import os
+import re
 import fnmatch
+from datetime import datetime
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, TALB, TDRC, TCON, TRCK
 
@@ -56,30 +58,74 @@ class Prospector:
         try:
             audio = MP3(filepath, ID3=ID3)
 
-            # Extract ID3v2 tag information
-            TPE1 = audio.tags.get('TPE1', None)
-            TIT2 = audio.tags.get('TIT2', None)
-            TALB = audio.tags.get('TALB', None)
-            TDRC = audio.tags.get('TDRC', None)
-            TCON = audio.tags.get('TCON', None)
-            TRCK = audio.tags.get('TRCK', None)
-
+            TPE1 = self.check_TPE1(audio.tags.get('TPE1', None))
+            TIT2 = self.check_TIT2(audio.tags.get('TIT2', None), filename)
+            TALB = self.check_TALB(audio.tags.get('TALB', None), filepath)
+            TDRC = self.check_TDRC(audio.tags.get('TDRC', None))
+            TCON = self.check_TCON(audio.tags.get('TCON', None))
+            TRCK = self.check_TRCK(audio.tags.get('TRCK', None))
+            
             # Create a Mena instance with extracted data
             print(f"Song correctly read at: {filepath}")
             return Mena(
                 PATH=filepath,
-                TPE1=TPE1.text[0] if TPE1 else "Unknown",
-                TIT2=TIT2.text[0] if TIT2 else "Unknown",
-                TALB=TALB.text[0] if TALB else "Unknown",
-                TDRC=TDRC.text[0].year if TDRC else "2024",
-                TCON=TCON.text[0] if TCON else "Unknown",
-                TRCK=TRCK.text[0] if TRCK else "0"
+                TPE1=TPE1,
+                TIT2=TIT2,
+                TALB=TALB,
+                TDRC=TDRC,
+                TCON=TCON,
+                TRCK=TRCK
             )
         except Exception as e:
             print(f"Error extracting tags from {filepath}: {e}")
             return None
+        
+    def check_TPE1(self, value):
+        """Check if TPE1 (Lead performer) is not empty; return 'Unknown' if empty."""
+        return value.text[0] if value and value.text[0] else 'Unknown'
 
+    def check_TIT2(self, value, filename):
+        """Check if TIT2 (Title) is not empty; return filename if empty."""
+        return value.text[0] if value and value.text[0] else filename
 
+    def check_TALB(self, value, filepath):
+        """Check if TALB (Album) is not empty; return last directory name if empty."""
+        if value and value.text[0]:
+            return value.text[0]
+        dirpath = os.path.dirname(filepath)
+        return os.path.basename(dirpath) if dirpath else 'Unknown'
+
+    def check_TDRC(self, value):
+        """Check if TDRC (Recording year) is not empty and is an integer; return current year if not."""
+        if value and value.text[0].year:
+            try:
+                year = int(value.text[0].year)
+                return year
+            except ValueError:
+                pass
+        return datetime.now().year
+
+    def check_TCON(self, value):
+        """Check if TCON (Genre) is not empty; return 'Unknown' if empty."""
+        return value.text[0] if value and value.text[0] else 'Unknown'
+
+    def check_TRCK(self, value):
+        """Check if TRCK (Track number) is not empty; if it's text, return first consecutive numbers or 0."""
+        
+        # Try converting the value to an integer directly
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            pass
+        
+        # Use regex to find the first consecutive digits
+        match = re.search(r'\d+', str(value))
+        if match:
+            return int(match.group(0))
+        
+        # Return 0 if no valid integer or digits are found
+        return 0
+            
 class Minero:
     def __init__(self):
         self.rolas = []
