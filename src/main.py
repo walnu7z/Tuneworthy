@@ -1,9 +1,10 @@
 import sys
 from src.Minero import *
+from src.TuneworthyPlayer import *
 
 def main():
-    print("Hello, World!")
-    minero = Minero()
+    app = TuneworthyPlayer(application_id="com.github.walnu7z.Tuneworthy")
+    app.run(sys.argv)
     
 
 if __name__ == "__main__":

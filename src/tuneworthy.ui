@@ -1,0 +1,421 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.92.0 -->
+<interface>
+  <!-- interface-name tuneworthy.ui -->
+  <requires lib="gio" version="2.0"/>
+  <requires lib="gtk" version="4.8"/>
+  <object class="GtkApplicationWindow" id="window">
+    <property name="default-height">400</property>
+    <property name="default-width">600</property>
+    <property name="icon-name">audio-x-generic</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="headerbar">
+        <child type="end">
+          <object class="GtkMenuButton" id="gear_menu_button">
+            <property name="icon-name">open-menu-symbolic</property>
+            <property name="menu-model">gear_menu</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="toggle_search">
+            <property name="active" bind-source="searchbar" bind-property="search-mode-enabled" bind-flags="bidirectional | sync-create">False</property>
+            <property name="focus-on-click">False</property>
+            <property name="icon-name">edit-find-symbolic</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkButton">
+            <property name="action-name">win.mine</property>
+            <property name="label">Mine</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGrid">
+        <child>
+          <object class="GtkStackSwitcher">
+            <property name="halign">center</property>
+            <property name="stack">stack</property>
+            <property name="valign">start</property>
+            <layout>
+              <property name="column">1</property>
+              <property name="row">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="left_pane">
+            <property name="baseline-position">top</property>
+            <property name="halign">start</property>
+            <property name="orientation">vertical</property>
+            <property name="vexpand">True</property>
+            <property name="width-request">180</property>
+            <child>
+              <object class="GtkSearchBar" id="searchbar">
+                <child>
+                  <object class="GtkSearchEntry" id="search-entry"/>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="vexpand">True</property>
+                <child>
+                  <object class="GtkListView">
+                    <property name="factory">
+                      <object class="GtkBuilderListItemFactory"/>
+                    </property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <layout>
+              <property name="column">0</property>
+              <property name="row">0</property>
+              <property name="row-span">3</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="hexpand">True</property>
+            <property name="hexpand-set">True</property>
+            <child>
+              <object class="GtkStackPage">
+                <property name="child">
+                  <object class="GtkBox">
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="hexpand">1</property>
+                        <property name="margin-bottom">10</property>
+                        <property name="margin-end">10</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-top">10</property>
+                        <property name="vexpand">1</property>
+                        <child>
+                          <object class="GtkColumnView" id="columnview">
+                            <child>
+                              <object class="GtkColumnViewColumn" id="name_column">
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <binding name="label">
+          <lookup name="name" type="SettingsKey">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="title">Name</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkColumnViewColumn">
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkEditableLabel">
+        <binding name="text">
+          <lookup name="value" type="SettingsKey">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+        <signal name="notify::label" handler="item_value_changed"/>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="resizable">1</property>
+                                <property name="title">Value</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkColumnViewColumn" id="type_column">
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <binding name="label">
+          <lookup name="type" type="SettingsKey">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="resizable">1</property>
+                                <property name="title">Type</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkColumnViewColumn" id="default_column">
+                                <property name="expand">1</property>
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <binding name="label">
+          <lookup name="default-value" type="SettingsKey">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="resizable">1</property>
+                                <property name="title">Default</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkColumnViewColumn" id="summary_column">
+                                <property name="expand">1</property>
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <property name="wrap">1</property>
+        <binding name="label">
+          <lookup name="summary" type="SettingsKey">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="resizable">1</property>
+                                <property name="title">Summary</property>
+                                <property name="visible">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkColumnViewColumn" id="description_column">
+                                <property name="expand">1</property>
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <property name="wrap">1</property>
+        <binding name="label">
+          <lookup name="description" type="SettingsKey">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="resizable">1</property>
+                                <property name="title">Description</property>
+                                <property name="visible">0</property>
+                              </object>
+                            </child>
+                            <style>
+                              <class name="data-table"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+                <property name="name">songs</property>
+                <property name="title">Songs</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStackPage">
+                <property name="child">
+                  <object class="GtkImage">
+                    <property name="icon-name">gtk3-demo</property>
+                    <property name="icon-size">large</property>
+                    <property name="pixel-size">100</property>
+                    <property name="vexpand">True</property>
+                  </object>
+                </property>
+                <property name="name">albums</property>
+                <property name="title">Albums</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStackPage">
+                <property name="child">
+                  <object class="GtkLevelBar">
+                    <property name="halign">baseline</property>
+                    <property name="valign">center</property>
+                    <property name="value">0.1</property>
+                  </object>
+                </property>
+                <property name="icon-name">org.gnome.Settings-file-history-symbolic</property>
+                <property name="name">Miner</property>
+                <property name="title">Miner Progress Bar</property>
+              </object>
+            </child>
+            <layout>
+              <property name="column">1</property>
+              <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="right_pane">
+            <child>
+              <object class="GtkAspectFrame">
+                <property name="margin-bottom">2</property>
+                <property name="margin-end">2</property>
+                <property name="margin-start">2</property>
+                <property name="margin-top">2</property>
+                <property name="valign">end</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">minecraft-launcher</property>
+                    <property name="icon-size">normal</property>
+                    <property name="pixel-size">90</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <layout>
+              <property name="column">2</property>
+              <property name="row">0</property>
+              <property name="row-span">3</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="controls">
+            <property name="orientation">vertical</property>
+            <property name="valign">center</property>
+            <child>
+              <object class="GtkBox">
+                <property name="halign">center</property>
+                <property name="margin-bottom">2</property>
+                <property name="margin-end">2</property>
+                <property name="margin-start">2</property>
+                <property name="margin-top">2</property>
+                <child>
+                  <object class="GtkButton">
+                    <property name="icon-name">media-seek-backward-symbolic</property>
+                    <property name="margin-end">2</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="icon-name">media-skip-backward-symbolic</property>
+                    <property name="margin-end">2</property>
+                    <property name="margin-start">2</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkToggleButton">
+                    <property name="icon-name">media-playback-start-symbolic</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="icon-name">media-skip-forward-symbolic</property>
+                    <property name="margin-end">2</property>
+                    <property name="margin-start">2</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="icon-name">media-seek-forward-symbolic</property>
+                    <property name="margin-end">2</property>
+                    <property name="margin-start">2</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <child>
+                  <object class="GtkScale">
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="step-increment">0.01</property>
+                        <property name="upper">1.0</property>
+                      </object>
+                    </property>
+                    <property name="hexpand">True</property>
+                    <property name="show-fill-level">True</property>
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkVolumeButton"/>
+                </child>
+              </object>
+            </child>
+            <layout>
+              <property name="column">1</property>
+              <property name="row">2</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <menu id="gear_menu">
+    <section>
+      <item/>
+      <item/>
+      <item/>
+    </section>
+  </menu>
+</interface>
