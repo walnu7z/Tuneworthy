@@ -1,8 +1,10 @@
 from src.Database import *
 from src.Rola import *
 import os
+import time
 import re
 import fnmatch
+import threading
 from datetime import datetime
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, TALB, TDRC, TCON, TRCK
@@ -19,8 +21,13 @@ class Mena:
 
 class Prospector:
     def __init__(self, directory = "~/Music"):
-        self.directory = os.path.expanduser(directory)
+        self.total_files = 0
+        self.processed_files = 0
         self.mp3_dir_files = []
+        self.menas = []
+        self.directory = os.path.expanduser(directory)
+    
+    def prospect(self):
         self.find_mp3_files()
 
     def find_mp3_files(self):
@@ -30,10 +37,13 @@ class Prospector:
         Returns:
             list: A list of paths to MP3 files.
         """
+        counter = 0
         for dirpath, dirnames, filenames in os.walk(self.directory):
             self.mp3_dir_files.append([dirpath, []])
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 self.mp3_dir_files[-1][1].append(filename)
+                counter += 1
+        self.total_files = counter
 
     def pop_and_extract(self):
         """Pop an item from mp3_dir_files, extract ID3 data, and return Mena instances."""
@@ -42,15 +52,17 @@ class Prospector:
             return []
 
         # Pop the first directory entry
+        
         mena_instances = []
         while self.mp3_dir_files:
             dirpath, mp3_files = self.mp3_dir_files.pop()
             for filename in mp3_files:
                 mena_instance = self.extract_id3v2_tags(dirpath, filename)
+                self.processed_files += 1
                 if mena_instance:
                     mena_instances.append(mena_instance)
 
-        return mena_instances
+        self.menas = mena_instances
 
     def extract_id3v2_tags(self, dirpath, filename):
         """Extract ID3v2 tags from an MP3 file and return a Mena instance."""
@@ -66,7 +78,7 @@ class Prospector:
             TRCK = self.check_TRCK(audio.tags.get('TRCK', None))
             
             # Create a Mena instance with extracted data
-            print(f"Song correctly read at: {filepath}")
+            #print(f"Song correctly read at: {filepath}")
             return Mena(
                 PATH=filepath,
                 TPE1=TPE1,
@@ -130,14 +142,47 @@ class Minero:
     def __init__(self):
         self.rolas = []
         self.db = MusicLibraryDB()
-        self.populate_DB()
+        self.prospector = Prospector()
+        self.mining_progress = 0
+        self.isExtracting = False
+        self.isMining = False
+        self.isMining_finished = False
+
+
+    def mine(self):
+        self.prospector.prospect()
+        extracting_thread = threading.Thread(target=self.walk_and_extract_dir)
+        extracting_thread.start()
+        self.isExtracting = True
+        while(extracting_thread.is_alive and self.isExtracting):
+            self.mining_progress = self.prospector.processed_files / self.prospector.total_files
+            time.sleep(0.5)
+        extracting_thread.join() 
+
+        mining_thread = threading.Thread(target=self.populate_DB)
+        mining_thread.start()
+        self.isMining = True
+        while(mining_thread.is_alive and self.isMining):
+            self.mining_progress = self.prospector.processed_files / self.prospector.total_files
+            time.sleep(0.5)
+        mining_thread.join() 
+        self.isMining_finished = True
         print("Rolas agregadas!")
 
+    def walk_and_extract_dir(self):
+        self.prospector.pop_and_extract()
+        self.isExtracting = False
+
     def populate_DB(self):
-        prospector = Prospector()
-        menas = prospector.pop_and_extract()
-        for entry in menas:
+        total = self.prospector.total_files
+        current = 0
+        for entry in self.prospector.menas:
             self.rolas.append(self.add_entry_from_mena(entry))
+            current += 1
+            self.mining_progress = current/total
+        self.mining_progress = 1
+        self.isMining = False
+    
 
     def add_entry_from_mena(self, mena: Mena):
         return self.db.add_song(mena.TPE1, mena.TALB, mena.PATH, mena.TIT2, mena.TRCK, mena.TDRC, mena.TCON)

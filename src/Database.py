@@ -4,10 +4,11 @@ from src.Rola import *
 
 class MusicLibraryDB:
     def __init__(self, db_name='biblioteca.db'):
-        self.conn = sqlite3.connect(db_name)
-        self.conn.execute('PRAGMA foreign_keys = ON')
-        self.cursor = self.conn.cursor()
-        self.deploy()
+        self.db_name = db_name
+        conn = sqlite3.connect(self.db_name)
+        conn.execute('PRAGMA foreign_keys = ON')
+        self.deploy(conn)
+        self.close(conn)
 
     def add_performer(self, id_type, name):
         self.cursor.execute('''
@@ -51,21 +52,23 @@ class MusicLibraryDB:
         ''', (id_person, id_group))
         self.conn.commit()
 
-    def close(self):
-        self.conn.close()
+    def close(self,conn):
+        conn.close()
 
     def add_song(self, performer, album, path, title, track, year, genre):
-        conn = self.conn
-        cursor = self.cursor
+        conn = sqlite3.connect(self.db_name)
+        conn.execute('PRAGMA foreign_keys = ON')
+        cursor = conn.cursor()
 
-        id_performer = self.insert_performer_if_not_exists(2, performer)
-        id_album = self.insert_album_if_not_exists(path, album, year) 
+        id_performer = self.insert_performer_if_not_exists(conn, 2, performer)
+        id_album = self.insert_album_if_not_exists(conn, path, album, year) 
 
         cursor.execute('INSERT INTO rolas (id_performer, id_album, path, title, track, year, genre) '
                     'VALUES (?, ?, ?, ?, ?, ?, ?)', 
                     (id_performer, id_album, path, title, track, year, genre))
 
         conn.commit()
+        self.close(conn)
         
         RB = RolaBuilder()
         RB.set_album(album)
@@ -81,9 +84,8 @@ class MusicLibraryDB:
 
 
     # Function to insert into performers table only if the performer doesn't exist, return id_performer
-    def insert_performer_if_not_exists(self, performer_type, performer_name):
-        # Check if performer already exists
-        cursor = self.cursor
+    def insert_performer_if_not_exists(self, conn, performer_type, performer_name):
+        cursor = conn.cursor()
         cursor.execute('SELECT id_performer FROM performers WHERE name = ?', (performer_name,))
         result = cursor.fetchone()
 
@@ -95,10 +97,10 @@ class MusicLibraryDB:
         return cursor.lastrowid  # Return new id_performer
 
     # Function to insert into albums table only if the album doesn't exist, return id_album
-    def insert_album_if_not_exists(self, filepath, album_name, album_year):
-        # Check if album already exists
+    def insert_album_if_not_exists(self, conn, filepath, album_name, album_year):
+        cursor = conn.cursor()
         album_path = os.path.dirname(filepath)
-        cursor = self.cursor
+
         cursor.execute('SELECT id_album FROM albums WHERE path = ? AND name = ? AND year = ?', 
                     (album_path, album_name, album_year))
         result = cursor.fetchone()
@@ -111,7 +113,7 @@ class MusicLibraryDB:
                     (album_path, album_name, album_year))
         return cursor.lastrowid  # Return new id_album
 
-    def deploy(self):
+    def deploy(self,conn):
         """
         Check if the database is defined correctly.
         If not, deploy the schema.
@@ -119,13 +121,14 @@ class MusicLibraryDB:
         :param conn: sqlite3.Connection object
         """
         try:
-            cursor = self.cursor
+            cursor = conn.cursor()
+
             cursor.execute("SELECT * FROM sqlite_master WHERE type='table' AND name='types';")
             table_exists = cursor.fetchone()
 
             if table_exists is None:
                 print("Table does not exist. Deploying schema...")
-                self.deploy_schema()
+                self.deploy_schema(conn)
             else:
                 print("Database already deployed")
         
@@ -134,15 +137,16 @@ class MusicLibraryDB:
 
 
     # Function to deploy the schema
-    def deploy_schema(self):
-        self.cursor.execute('''
+    def deploy_schema(self,conn):
+        cursor = conn.cursor()
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS types (
                 id_type       INTEGER PRIMARY KEY,
                 description   TEXT
             )
         ''')
 
-        self.cursor.executemany('''
+        cursor.executemany('''
         INSERT OR IGNORE INTO types (id_type, description)
         VALUES (?, ?)
         ''', [
@@ -151,7 +155,7 @@ class MusicLibraryDB:
             (2, 'Unknown')
         ])
 
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS performers (
                 id_performer  INTEGER PRIMARY KEY,
                 id_type       INTEGER,
@@ -160,7 +164,7 @@ class MusicLibraryDB:
             )
         ''')
 
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS persons (
                 id_person     INTEGER PRIMARY KEY,
                 stage_name    TEXT,
@@ -170,7 +174,7 @@ class MusicLibraryDB:
             )
         ''')
 
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS groups (
                 id_group      INTEGER PRIMARY KEY,
                 name          TEXT,
@@ -179,7 +183,7 @@ class MusicLibraryDB:
             )
         ''')
 
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS in_group (
                 id_person     INTEGER,
                 id_group      INTEGER,
@@ -189,7 +193,7 @@ class MusicLibraryDB:
             )
         ''')
 
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS albums (
                 id_album      INTEGER PRIMARY KEY,
                 path          TEXT,
@@ -198,7 +202,7 @@ class MusicLibraryDB:
             )
         ''')
 
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS rolas (
                 id_rola       INTEGER PRIMARY KEY,
                 id_performer  INTEGER,
@@ -212,5 +216,5 @@ class MusicLibraryDB:
                 FOREIGN KEY   (id_album) REFERENCES albums(id_album)
             )
         ''')
-
-        self.conn.commit()
+        conn.commit()
+        

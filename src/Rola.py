@@ -1,5 +1,20 @@
-class Rola:
+from gi.repository import GObject
+
+class Song(GObject.Object):
+    __gtype_name__ = 'Song'
+    id_performer = GObject.Property(type=int)
+    id_performer_type =  GObject.Property(type=int)
+    id_album = GObject.Property(type=int)
+    path =  GObject.Property(type=str)
+    title =  GObject.Property(type=str)
+    track =  GObject.Property(type=int)
+    year =  GObject.Property(type=int)
+    genre =  GObject.Property(type=str)
+    album =  GObject.Property(type=str)
+    performer =  GObject.Property(type=str)
+
     def __init__(self, id_performer, id_performer_type, id_album, path, title, track, year, genre, album, performer):
+        super().__init__()
         self.id_performer = id_performer
         self.id_performer_type = id_performer_type
         self.id_album = id_album
@@ -23,13 +38,13 @@ class Rola:
 
 class RolaBuilder:
     def __init__(self):
-        self._id_performer = None
-        self._id_performer_type = None
-        self._id_album = None
+        self._id_performer = -1
+        self._id_performer_type = -1
+        self._id_album = -1
         self._path = None
         self._title = None
-        self._track = None
-        self._year = None
+        self._track = -1
+        self._year = -1
         self._genre = None
         self._album = None
         self._performer = None
@@ -77,7 +92,7 @@ class RolaBuilder:
         return self
 
     def build(self):
-        return Rola(
+        return Song(
             id_performer=self._id_performer,
             id_performer_type=self._id_performer_type,
             id_album=self._id_album,

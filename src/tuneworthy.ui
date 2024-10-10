@@ -2,7 +2,7 @@
 <!-- Created with Cambalache 0.92.0 -->
 <interface>
   <!-- interface-name tuneworthy.ui -->
-  <requires lib="gio" version="2.0"/>
+  <requires lib="gio" version="2.44"/>
   <requires lib="gtk" version="4.8"/>
   <object class="GtkApplicationWindow" id="window">
     <property name="default-height">400</property>
@@ -25,7 +25,7 @@
           </object>
         </child>
         <child type="end">
-          <object class="GtkButton">
+          <object class="GtkButton" id="mine_button">
             <property name="action-name">win.mine</property>
             <property name="label">Mine</property>
             <property name="valign">center</property>
@@ -36,7 +36,7 @@
     <child>
       <object class="GtkGrid">
         <child>
-          <object class="GtkStackSwitcher">
+          <object class="GtkStackSwitcher" id="stack_switcher">
             <property name="halign">center</property>
             <property name="stack">stack</property>
             <property name="valign">start</property>
@@ -89,6 +89,7 @@
                   <object class="GtkBox">
                     <child>
                       <object class="GtkScrolledWindow">
+                        <property name="has-frame">True</property>
                         <property name="hexpand">1</property>
                         <property name="margin-bottom">10</property>
                         <property name="margin-end">10</property>
@@ -97,8 +98,18 @@
                         <property name="vexpand">1</property>
                         <child>
                           <object class="GtkColumnView" id="columnview">
+                            <property name="model">
+                              <object class="GtkSingleSelection" id="model">
+                                <property name="model">
+                                  <object class="GListStore" id="model_list"/>
+                                </property>
+                              </object>
+                            </property>
+                            <property name="show-column-separators">True</property>
+                            <property name="show-row-separators">True</property>
                             <child>
-                              <object class="GtkColumnViewColumn" id="name_column">
+                              <object class="GtkColumnViewColumn" id="song_column">
+                                <property name="expand">True</property>
                                 <property name="factory">
                                   <object class="GtkBuilderListItemFactory">
                                     <property name="bytes"><![CDATA[
@@ -109,7 +120,7 @@
       <object class="GtkLabel">
         <property name="xalign">0</property>
         <binding name="label">
-          <lookup name="name" type="SettingsKey">
+          <lookup name="title" type="Song">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -117,41 +128,15 @@
     </property>
   </template>
 </interface>
-                        ]]></property>
+]]></property>
                                   </object>
                                 </property>
-                                <property name="title">Name</property>
+                                <property name="resizable">True</property>
+                                <property name="title">Song</property>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkColumnViewColumn">
-                                <property name="factory">
-                                  <object class="GtkBuilderListItemFactory">
-                                    <property name="bytes"><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
-<interface>
-  <template class="GtkListItem">
-    <property name="child">
-      <object class="GtkEditableLabel">
-        <binding name="text">
-          <lookup name="value" type="SettingsKey">
-            <lookup name="item">GtkListItem</lookup>
-          </lookup>
-        </binding>
-        <signal name="notify::label" handler="item_value_changed"/>
-      </object>
-    </property>
-  </template>
-</interface>
-                        ]]></property>
-                                  </object>
-                                </property>
-                                <property name="resizable">1</property>
-                                <property name="title">Value</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkColumnViewColumn" id="type_column">
+                              <object class="GtkColumnViewColumn" id="artist_column">
                                 <property name="factory">
                                   <object class="GtkBuilderListItemFactory">
                                     <property name="bytes"><![CDATA[
@@ -162,7 +147,7 @@
       <object class="GtkLabel">
         <property name="xalign">0</property>
         <binding name="label">
-          <lookup name="type" type="SettingsKey">
+          <lookup name="performer" type="Song"> 
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -170,16 +155,15 @@
     </property>
   </template>
 </interface>
-                        ]]></property>
+]]></property>
                                   </object>
                                 </property>
                                 <property name="resizable">1</property>
-                                <property name="title">Type</property>
+                                <property name="title">Artist</property>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkColumnViewColumn" id="default_column">
-                                <property name="expand">1</property>
+                              <object class="GtkColumnViewColumn" id="album_column">
                                 <property name="factory">
                                   <object class="GtkBuilderListItemFactory">
                                     <property name="bytes"><![CDATA[
@@ -188,9 +172,8 @@
   <template class="GtkListItem">
     <property name="child">
       <object class="GtkLabel">
-        <property name="xalign">0</property>
         <binding name="label">
-          <lookup name="default-value" type="SettingsKey">
+          <lookup name="album" type="Song">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -202,12 +185,11 @@
                                   </object>
                                 </property>
                                 <property name="resizable">1</property>
-                                <property name="title">Default</property>
+                                <property name="title">Album</property>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkColumnViewColumn" id="summary_column">
-                                <property name="expand">1</property>
+                              <object class="GtkColumnViewColumn" id="year_column">
                                 <property name="factory">
                                   <object class="GtkBuilderListItemFactory">
                                     <property name="bytes"><![CDATA[
@@ -217,9 +199,8 @@
     <property name="child">
       <object class="GtkLabel">
         <property name="xalign">0</property>
-        <property name="wrap">1</property>
         <binding name="label">
-          <lookup name="summary" type="SettingsKey">
+          <lookup name="year" type="Song">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -231,13 +212,11 @@
                                   </object>
                                 </property>
                                 <property name="resizable">1</property>
-                                <property name="title">Summary</property>
-                                <property name="visible">0</property>
+                                <property name="title">Year</property>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkColumnViewColumn" id="description_column">
-                                <property name="expand">1</property>
+                              <object class="GtkColumnViewColumn" id="genre_column">
                                 <property name="factory">
                                   <object class="GtkBuilderListItemFactory">
                                     <property name="bytes"><![CDATA[
@@ -247,9 +226,8 @@
     <property name="child">
       <object class="GtkLabel">
         <property name="xalign">0</property>
-        <property name="wrap">1</property>
         <binding name="label">
-          <lookup name="description" type="SettingsKey">
+          <lookup name="genre" type="Song">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -261,8 +239,34 @@
                                   </object>
                                 </property>
                                 <property name="resizable">1</property>
-                                <property name="title">Description</property>
-                                <property name="visible">0</property>
+                                <property name="title">Genre</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkColumnViewColumn" id="track_column">
+                                <property name="factory">
+                                  <object class="GtkBuilderListItemFactory">
+                                    <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <binding name="label">
+          <lookup name="track" type="Song">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+                        ]]></property>
+                                  </object>
+                                </property>
+                                <property name="resizable">1</property>
+                                <property name="title">Track</property>
                               </object>
                             </child>
                             <style>
@@ -293,12 +297,30 @@
               </object>
             </child>
             <child>
-              <object class="GtkStackPage">
+              <object class="GtkStackPage" id="mining_page">
                 <property name="child">
-                  <object class="GtkLevelBar">
-                    <property name="halign">baseline</property>
+                  <object class="GtkBox">
+                    <property name="homogeneous">True</property>
+                    <property name="orientation">vertical</property>
                     <property name="valign">center</property>
-                    <property name="value">0.1</property>
+                    <child>
+                      <object class="GtkLabel" id="mining_label">
+                        <property name="label"> Press 'Mine' to start</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLevelBar" id="mining_progress_bar">
+                        <property name="margin-end">5</property>
+                        <property name="margin-start">5</property>
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="mining_percentage">
+                        <property name="label"> </property>
+                        <property name="visible">False</property>
+                      </object>
+                    </child>
                   </object>
                 </property>
                 <property name="icon-name">org.gnome.Settings-file-history-symbolic</property>
@@ -385,6 +407,12 @@
             <child>
               <object class="GtkBox">
                 <child>
+                  <object class="GtkLabel">
+                    <property name="label">0:00</property>
+                    <property name="margin-start">5</property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkScale">
                     <property name="adjustment">
                       <object class="GtkAdjustment">
@@ -392,13 +420,22 @@
                         <property name="upper">1.0</property>
                       </object>
                     </property>
+                    <property name="digits">2</property>
                     <property name="hexpand">True</property>
                     <property name="show-fill-level">True</property>
                     <property name="valign">center</property>
+                    <property name="value-pos">left</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkVolumeButton"/>
+                  <object class="GtkLabel">
+                    <property name="label">0:00</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkVolumeButton">
+                    <property name="value">1.0</property>
+                  </object>
                 </child>
               </object>
             </child>
