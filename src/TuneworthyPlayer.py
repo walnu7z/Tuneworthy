@@ -30,6 +30,8 @@ class TuneworthyPlayer(Adw.Application):
         self.win = self.builder.get_object("window")  # Make sure the ID matches your UI file
         self.win.set_application(app)  # Set the application for the window
 
+
+
         #self.builder.connect_signals(self)        
 
         self.song_liststore = self.builder.get_object("model_list") 
@@ -49,6 +51,18 @@ class TuneworthyPlayer(Adw.Application):
         self.mining_percentage = self.builder.get_object("mining_percentage")
         self.mining_progress_bar = self.builder.get_object("mining_progress_bar") 
         self.search_entry = self.builder.get_object("search_entry")
+
+        self.import_dir_button = self.builder.get_object('import_dir')
+        self.dialog = self.builder.get_object('set_path_dialog')
+        self.dir_path_label = self.builder.get_object('dir_path')
+        self.set_path_button = self.builder.get_object('set_path')
+        self.dir_path_label = self.builder.get_object('path_label')
+
+
+        # Connect signals
+        self.import_dir_button.connect('clicked', self.on_import_dir_clicked)
+        self.set_path_button.connect('clicked', self.on_set_path_clicked)
+        
 
         # Connect signals
         self.search_entry.connect("activate", self.on_activate_search)
@@ -149,4 +163,19 @@ class TuneworthyPlayer(Adw.Application):
     def on_stop_search(self, search_entry):
         print("Search stopped")
 
+    def on_import_dir_clicked(self, button):
+        # Show the dialog
+        self.dialog.show()
+
+    def on_set_path_clicked(self, button):
+        # Get the text from the editable label
+        path = self.dir_path_label.get_text()
+
+        # Verify the provided path
+        if os.path.isdir(os.path.expanduser(path)):
+            print(f"Path verified: {path}")
+            self.path = path  # Store the path in self.path
+            self.dialog.hide()  # Hide the dialog
+        else:
+            print(f"Invalid path: {path}")
 

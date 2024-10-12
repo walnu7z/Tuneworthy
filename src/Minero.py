@@ -154,6 +154,10 @@ class Minero:
         extracting_thread = threading.Thread(target=self.walk_and_extract_dir)
         extracting_thread.start()
         self.isExtracting = True
+        if(self.prospector.total_files == 0):
+            self.mining_progress = 1
+            self.isMining_finished = True
+            return
         while(extracting_thread.is_alive and self.isExtracting):
             self.mining_progress = self.prospector.processed_files / self.prospector.total_files
             time.sleep(0.5)

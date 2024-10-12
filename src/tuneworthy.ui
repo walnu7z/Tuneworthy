@@ -5,15 +5,14 @@
   <requires lib="gio" version="2.44"/>
   <requires lib="gtk" version="4.8"/>
   <object class="GtkApplicationWindow" id="window">
-    <property name="default-height">400</property>
-    <property name="default-width">600</property>
+    <property name="default-height">600</property>
+    <property name="default-width">800</property>
     <property name="icon-name">audio-x-generic</property>
     <child type="titlebar">
       <object class="GtkHeaderBar" id="headerbar">
         <child type="end">
-          <object class="GtkMenuButton" id="gear_menu_button">
-            <property name="icon-name">open-menu-symbolic</property>
-            <property name="menu-model">gear_menu</property>
+          <object class="GtkButton" id="import_dir">
+            <property name="icon-name">inode-directory-symbolic</property>
           </object>
         </child>
         <child>
@@ -56,24 +55,14 @@
             <child>
               <object class="GtkSearchBar" id="searchbar">
                 <child>
-                  <object class="GtkSearchEntry" id="search_entry"/>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkScrolledWindow">
-                <property name="vexpand">True</property>
-                <child>
-                  <object class="GtkListView">
-                    <property name="factory">
-                      <object class="GtkBuilderListItemFactory"/>
-                    </property>
+                  <object class="GtkSearchEntry" id="search_entry">
+                    <property name="search-delay">300</property>
                   </object>
                 </child>
               </object>
             </child>
             <layout>
-              <property name="column">0</property>
+              <property name="column">1</property>
               <property name="row">0</property>
               <property name="row-span">3</property>
             </layout>
@@ -294,6 +283,7 @@
                 </property>
                 <property name="name">albums</property>
                 <property name="title">Albums</property>
+                <property name="visible">False</property>
               </object>
             </child>
             <child>
@@ -347,7 +337,7 @@
                   <object class="GtkImage">
                     <property name="icon-name">audio-x-generic</property>
                     <property name="icon-size">normal</property>
-                    <property name="pixel-size">90</property>
+                    <property name="pixel-size">200</property>
                   </object>
                 </child>
               </object>
@@ -448,11 +438,41 @@
       </object>
     </child>
   </object>
-  <menu id="gear_menu">
-    <section>
-      <item/>
-      <item/>
-      <item/>
-    </section>
-  </menu>
+  <object class="GtkDialog" id="set_path_dialog">
+    <property name="name">Music directory</property>
+    <property name="title">Music Library Path</property>
+    <property name="visible">False</property>
+    <child>
+      <object class="GtkBox">
+        <child>
+          <object class="GtkLabel">
+            <property name="justify">center</property>
+            <property name="label">Please provide the path to your music library.</property>
+            <property name="lines">3</property>
+            <property name="margin-end">10</property>
+            <property name="margin-start">10</property>
+            <property name="max-width-chars">40</property>
+            <property name="width-request">150</property>
+            <property name="wrap">True</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkEditableLabel" id="path_label">
+            <property name="hexpand">True</property>
+            <property name="text">/enter/path/to/music/dir</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="set_path">
+            <property name="label">Set</property>
+            <property name="margin-bottom">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-start">5</property>
+            <property name="margin-top">5</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
 </interface>
