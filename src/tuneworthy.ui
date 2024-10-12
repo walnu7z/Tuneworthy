@@ -56,9 +56,7 @@
             <child>
               <object class="GtkSearchBar" id="searchbar">
                 <child>
-                  <object class="GtkSearchEntry" id="search_entry">
-                    <property name="search-delay">1000</property>
-                  </object>
+                  <object class="GtkSearchEntry" id="search_entry"/>
                 </child>
               </object>
             </child>
@@ -347,7 +345,7 @@
                 <property name="valign">end</property>
                 <child>
                   <object class="GtkImage">
-                    <property name="icon-name">minecraft-launcher</property>
+                    <property name="icon-name">audio-x-generic</property>
                     <property name="icon-size">normal</property>
                     <property name="pixel-size">90</property>
                   </object>
