@@ -183,6 +183,8 @@ class Minero:
         self.mining_progress = 1
         self.isMining = False
     
+    def search(self, query):
+        return self.db.execute_query(query)
 
     def add_entry_from_mena(self, mena: Mena):
         return self.db.add_song(mena.TPE1, mena.TALB, mena.PATH, mena.TIT2, mena.TRCK, mena.TDRC, mena.TCON)

@@ -56,7 +56,9 @@
             <child>
               <object class="GtkSearchBar" id="searchbar">
                 <child>
-                  <object class="GtkSearchEntry" id="search-entry"/>
+                  <object class="GtkSearchEntry" id="search_entry">
+                    <property name="search-delay">1000</property>
+                  </object>
                 </child>
               </object>
             </child>
@@ -84,7 +86,7 @@
             <property name="hexpand">True</property>
             <property name="hexpand-set">True</property>
             <child>
-              <object class="GtkStackPage">
+              <object class="GtkStackPage" id="songs_page">
                 <property name="child">
                   <object class="GtkBox">
                     <child>

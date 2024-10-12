@@ -83,6 +83,42 @@ class MusicLibraryDB:
         return RB.build()
 
 
+    def execute_query(self, sql_query):
+        # Connect to the SQLite database
+        connection = sqlite3.connect(self.db_name)
+        cursor = connection.cursor()
+
+        # Execute the query
+        cursor.execute(sql_query)
+
+        # Fetch all results
+        results = cursor.fetchall()
+
+        # List to hold Rola instances
+        rola_list = []
+
+        # Process each row in the results
+        for row in results:
+            title, album_name, performer_name, year, genre, track = row
+
+            # Use the RolaBuilder to create a Rola instance
+            RB = RolaBuilder()
+            RB.set_album(album_name)
+            RB.set_genre(genre)
+            RB.set_performer(performer_name)
+            RB.set_title(title)
+            RB.set_track(track)
+            RB.set_year(year)
+
+            # Build the Rola instance and add it to the list
+            rola_list.append(RB.build())
+
+        # Close the database connection
+        connection.close()
+
+        return rola_list
+
+
     # Function to insert into performers table only if the performer doesn't exist, return id_performer
     def insert_performer_if_not_exists(self, conn, performer_type, performer_name):
         cursor = conn.cursor()
